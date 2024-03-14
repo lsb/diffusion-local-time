@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <body style="overflow: hidden;">
+        <img id="image" style="height:100vh; position: absolute; left: 0; top: 0;">
+    </body>
+    <script>
+        var image = document.getElementById("image");
+        var lastImageData = null;
+
+        function fetchImage() {
+            fetch("./beauty.png?" + new Date().getTime())
+                .then(response => response.blob())
+                .then(blob => {
+                    var reader = new FileReader();
+                    reader.onloadend = function() {
+                        var currentImageData = reader.result;
+                        if (currentImageData !== lastImageData) {
+                            image.src = currentImageData;
+                            lastImageData = currentImageData;
+                        }
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch(error => {
+                    console.error("Error fetching image:", error);
+                });
+        }
+
+        setInterval(fetchImage, 1000);
+    </script>
+</html>
