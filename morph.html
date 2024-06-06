@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Current time</title>
+    <style>
+        html {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+        #displayText  { font-family: monospace; position: fixed; top: 0; left: 0; opacity: 0.5;}
+        #face { height: 56.25vw; width: 100vw; }
+    </style>
+    <script>
+        const smoothstep = (frac) => 3 * frac * frac - 2 * frac * frac * frac;
+        const smoothstep2 = (frac) => frac * frac * frac * (frac * (frac * 6 - 15) + 10);
+        const step_fraction = 1/16;
+        const prefix = "xl-morph/xl";
+        // const step_fraction = 1/8;
+        // const prefix = "xs1600";
+        const image_steps = Array.from({length: (1 + 1/step_fraction)}, (_, i) => i * step_fraction);
+
+        function updateImage() {
+            const d = new Date();
+            // d.setHours(0);
+            const   hourOfDay = d.getHours();
+            const minuteOfDay = d.getMinutes();
+            const secondOfDay = d.getSeconds() + d.getMilliseconds() / 1000;
+            const smoothMinuteFraction = smoothstep(smoothstep((secondOfDay / 60)));
+            // find closest image step to smoothMinuteFraction
+            const step = image_steps.reduce((a, b) => Math.abs(b - smoothMinuteFraction) < Math.abs(a - smoothMinuteFraction) ? b : a);
+            if(step === 1) {
+                d.setMinutes(minuteOfDay + 1); // this overflows to hours correctly
+            }
+            const hodz2 = d.getHours().toString().padStart(2,'0');
+            const modz2 = d.getMinutes().toString().padStart(2, '0');
+            const finalstep4 = (step === 1 ? 0 : step).toFixed(4);
+            const img_path = `./${prefix}-morph-${hodz2}${modz2}-${finalstep4}.png`;
+            const displayText = `${hourOfDay.toString().padStart(2,'0')}:${minuteOfDay.toString().padStart(2,'0')}:${(secondOfDay < 10 ? "0" : "") + secondOfDay.toFixed(4)} (${smoothMinuteFraction.toFixed(4)}) @ ${img_path}`;
+            const tinyDisplayText = `${hodz2}:${modz2} @ ${finalstep4}`;
+            document.getElementById("displayText").textContent = displayText;
+            document.getElementById("face").src = img_path;
+            document.getElementById("face").title = tinyDisplayText;
+            requestAnimationFrame(updateImage);
+        }
+        window.onload = updateImage;
+    </script>
+</head>
+<body>
+    <h1 id="displayText">time of day</h1>
+    <img id="face" src="">
+</body>
+</html>
