@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Position of text in control image</title>
+    <style>
+        #labelA, #labelB, #labelE  { font-family: monospace;}
+        #sixup img { height: 27vw; width: 48vw; }
+    </style>
+    <script>
+        const image_times = ["0420", "0857", "2358"];
+        function updateImage() {
+            var sliderA = document.getElementById("sliderA");
+            var valA = sliderA.value;
+            document.getElementById("labelA").textContent = valA;
+
+            (["low-", ""]).forEach(
+                textheight => image_times.forEach(
+                    time => document.getElementById("img" + textheight + time).src = "./xl-" + textheight + "seed0" + valA + "-" + time + ".jpeg"
+                )
+            )
+
+
+        }
+        window.onload = updateImage;
+    </script>
+</head>
+<body>
+    <h1>Position of text in control image</h1>
+    <h2>
+        Random seed <span id="labelA">100</span> <input type="range" id="sliderA" min="100" max="199" value="100" oninput="updateImage()" /> 
+    </h2>
+    <div id="sixup">
+        <img id="img0420" src="">
+        <img id="imglow-0420" src="">
+        <br>
+        <img id="img0857" src="">
+        <img id="imglow-0857" src="">
+        <br>
+        <img id="img2358" src="">
+        <img id="imglow-2358" src="">
+    </div>
+</body>
+</html>
