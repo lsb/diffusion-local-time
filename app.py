@@ -5,22 +5,21 @@ from datetime import datetime, timedelta
 from diffusers import StableDiffusionControlNetPipeline, ControlNetModel, AutoencoderTiny
 from diffusers.models.attention_processor import SlicedAttnProcessor
 from tqdm import tqdm
+from pathlib import Path
 
 def adjust_gamma(img, gamma=0.4):
     npim = np.array(img)
     npim_gamma = 255.0 * (npim / 255.0) ** gamma
     return Image.fromarray(np.uint8(npim_gamma))
 
-atkbold = ImageFont.truetype("Atkinson-Hyperlegible-Bold-102.otf", 600)
+atkbold = ImageFont.truetype("Atkinson-Hyperlegible-Bold-102.otf", 380)
 atkbold_smol = ImageFont.truetype("Atkinson-Hyperlegible-Bold-102.otf", 40)
 
-image_size = (1440, 810)
+image_size = (1600, 900)
 screen_size = image_size
 
 def mask_image(timestamp):
-    is_two_line = False # our images are 4:3 instead of 1:1, so we have space for all on one line
-    linesep = "\n" if is_two_line else ""
-    mask_text = timestamp.strftime(f"%-I{linesep}\u2009%M")
+    mask_text = timestamp.strftime(f"%H\u2009%M\u2009%S")
     time_img = Image.new("L", image_size, (0,))
     draw = ImageDraw.Draw(time_img)
     draw.multiline_text(
@@ -80,30 +79,47 @@ conditioning_scales = {
     cali1: 0.45,
     cali2: 0.5,
     cali3: 0.45,
-    cali4: 0.7,
+    cali4: 0.6,
 }
 negative_prompt = "low quality, ugly, wrong"
 
-demo_mode = True
-if demo_mode:
-    iteration_range = range(len(prompts) * (60 // rounding_minutes) * 48)
+xdalidemo = True
+fps = 10
+if xdalidemo:
+    iteration_range = range(86400 * fps)
 else:
     iteration_range = range(86400 * 365 * 80)
 
+def ease(x):
+    return (x * x) * (3 - 2 * x) # (x * x * x * x * x) * (126 - 420 * x + 540 * x * x - 315 * x * x * x + 70 * x * x * x * x)
+
 for iteration in tqdm(iteration_range):
-    if demo_mode:
-        synthetic_time = datetime(year=2000,month=1,day=1,hour=0,minute=0,second=0) + timedelta(seconds=iteration*rounding_minutes*60-1)
-        target_filename = f"face-render-{iteration:06}.png"
+    if xdalidemo:
+        synthetic_time = datetime(year=2000,month=1,day=1,hour=0,minute=0,second=0) + timedelta(microseconds=iteration*(1000000/fps))
+        target_filename = f"face-render-{iteration:08}.png"
         current_latency = 0
         pre_render_time = synthetic_time
+        target_time_plus_midpoint = synthetic_time
+        rounded_target_time = synthetic_time
+        this_second = synthetic_time
+        next_second = synthetic_time + timedelta(seconds=1)
+        this_mask = mask_image(this_second)
+        next_mask = mask_image(next_second)
+        easing_step = ease((iteration % fps) / fps)
+        current_mask_image = Image.fromarray(np.array(this_mask) * (1-easing_step) + np.array(next_mask) * (easing_step))
     else:
         pre_render_time = datetime.now()
+        target_time_plus_midpoint = pre_render_time + timedelta(seconds=(current_latency + rounding_minutes * 60 / 2))
+        rounded_target_time = target_time_plus_midpoint - timedelta(minutes=target_time_plus_midpoint.minute - target_time_plus_midpoint.minute // rounding_minutes * rounding_minutes)
+        current_mask_image = mask_image(timestamp=rounded_target_time)
 
-    target_time_plus_midpoint = pre_render_time + timedelta(seconds=(current_latency + rounding_minutes * 60 / 2))
-    rounded_target_time = target_time_plus_midpoint - timedelta(minutes=target_time_plus_midpoint.minute - target_time_plus_midpoint.minute // rounding_minutes * rounding_minutes)
-    current_mask_image = mask_image(timestamp=rounded_target_time)
     print(f"current_latency: {current_latency}, pre_render_time: {pre_render_time}, rounded_target_time: {rounded_target_time}, current_denoising_steps: {current_denoising_steps}\n")
 
+    if Path(target_filename).exists():
+        continue
+
+
+#    image = current_mask_image.convert("RGB")
     image = pipe(
         prompt=prompts[iteration % len(prompts)],
         negative_prompt=negative_prompt,
@@ -111,13 +127,13 @@ for iteration in tqdm(iteration_range):
         num_inference_steps=current_denoising_steps,
         guidance_scale=7.0,
         controlnet_conditioning_scale=conditioning_scales[prompts[iteration % len(prompts)]],
-        generator=torch.manual_seed(int(rounded_target_time.timestamp()) // 3600),
+        generator=torch.manual_seed(int(rounded_target_time.timestamp()) // 60),
         height=image_size[1],
         width=image_size[0],
     ).images[0]
-    image = adjust_gamma(image, gamma=0.5)
-    image = ImageEnhance.Sharpness(image).enhance(5)
-    image = image.resize(screen_size)
+    #image = adjust_gamma(image, gamma=0.5)
+    #image = ImageEnhance.Sharpness(image).enhance(5)
+    #image = image.resize(screen_size)
     if True:
         draw = ImageDraw.Draw(image)
         draw.text((60, screen_size[1]-60), f"leebutterman.com", fill=(255,255,255), font=atkbold_smol)

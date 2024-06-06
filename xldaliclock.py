@@ -10,9 +10,7 @@ from diffusers.models.attention_processor import SlicedAttnProcessor
 from tqdm import tqdm
 from pathlib import Path
 
-atkbold = ImageFont.truetype("Atkinson-Hyperlegible-Bold-102.otf", 380)
 atkbold = ImageFont.truetype("OCRB.ttf", 500)
-#atkbold_smol = ImageFont.truetype("Atkinson-Hyperlegible-Bold-102.otf", 40)
 
 image_size = (1600, 900)
 screen_size = image_size
@@ -41,7 +39,7 @@ def mask_image(timestamp):
 
 preferred_dtype = torch.float32
 preferred_device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
-preferred_device = "cpu"
+#preferred_device = "cpu"
 
 ctlnetmodelname = "monster-labs/control_v1p_sd15_qrcode_monster"
 ctlnetmodelsubfolder = "v2"
@@ -68,7 +66,7 @@ pipe = sdconstructor.from_pretrained(
 ).to(preferred_device)
 
 #pipe.vae.set_attn_processor(SlicedAttnProcessor(4))
-# pipe.unet.set_attn_processor(SlicedAttnProcessor(4))
+#pipe.unet.set_attn_processor(SlicedAttnProcessor(4))
 
 pipe.unet = torch.compile(pipe.unet)
 
