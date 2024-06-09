@@ -27,13 +27,14 @@ img {
   height: auto;
 }
 
-        #displayText  { font-family: monospace; position: fixed; top: 0; right: 0; font-size: 2in; opacity: 0.5; z-index: 100;}
+        #displayText  { font-family: monospace; position: fixed; top: 0; right: 0; font-size: 2in; opacity: 0.0005; z-index: 100;}
         #face { height: 56.25vw; width: 100vw; position: fixed; top: 0; left: 0;}
         #nextface { height: 56.25vw; width: 100vw; position: fixed; top: 0; left: 0; opacity: 0.00001;}
     </style>
     <script>
         const smoothstep = (frac) => 3 * frac * frac - 2 * frac * frac * frac;
         const smoothstep2 = (frac) => frac * frac * frac * (frac * (frac * 6 - 15) + 10);
+        const smoothstep6 = (frac) => 924 * Math.pow(frac, 13) - 6006 * Math.pow(frac, 12) + 16380 * Math.pow(frac, 11) - 24024 * Math.pow(frac, 10) + 20020 * Math.pow(frac, 9) - 9009 * Math.pow(frac, 8) + 1716 * Math.pow(frac, 7);
         // const step_fraction = 1/32;
         const prefix = "xl-morph/xl";
         // const step_fraction = 1/8;
@@ -47,7 +48,7 @@ img {
             const   hourOfDay = d.getHours();
             const minuteOfDay = d.getMinutes();
             const secondOfDay = d.getSeconds() + d.getMilliseconds() / 1000;
-            const smoothMinuteFraction = (smoothstep((secondOfDay / 60)));
+            const smoothMinuteFraction = smoothstep6((secondOfDay / 60));
             // find closest image step to smoothMinuteFraction
             const step = image_steps.reduce((a, b) => Math.abs(b - smoothMinuteFraction) < Math.abs(a - smoothMinuteFraction) ? b : a);
             if(step === 1) {
