@@ -27,18 +27,19 @@ img {
   height: auto;
 }
 
-        #displayText  { font-family: monospace; position: fixed; top: 0; left: 0; opacity: 0.5; z-index: 100;}
+        #displayText  { font-family: monospace; position: fixed; top: 0; right: 0; font-size: 2in; opacity: 0.5; z-index: 100;}
         #face { height: 56.25vw; width: 100vw; position: fixed; top: 0; left: 0;}
         #nextface { height: 56.25vw; width: 100vw; position: fixed; top: 0; left: 0; opacity: 0.00001;}
     </style>
     <script>
         const smoothstep = (frac) => 3 * frac * frac - 2 * frac * frac * frac;
         const smoothstep2 = (frac) => frac * frac * frac * (frac * (frac * 6 - 15) + 10);
-        const step_fraction = 1/32;
+        // const step_fraction = 1/32;
         const prefix = "xl-morph/xl";
         // const step_fraction = 1/8;
         // const prefix = "xs1600";
-        const image_steps = Array.from({length: (1 + 1/step_fraction)}, (_, i) => i * step_fraction);
+        // const image_steps = Array.from({length: (1 + 1/step_fraction)}, (_, i) => i * step_fraction); // apparently python {0.03125:.4f} is 0.0312 while {0.09375:.4f} is 0.0938
+        const image_steps = [0.0, 0.0312, 0.0625, 0.0938, 0.125, 0.1562, 0.1875, 0.2188, 0.2500, 0.2812, 0.3125, 0.3438, 0.3750, 0.4062, 0.4375, 0.4688, 0.5000, 0.5312, 0.5625, 0.5938, 0.6250, 0.6562, 0.6875, 0.7188, 0.7500, 0.7812, 0.8125, 0.8438, 0.8750, 0.9062, 0.9375, 0.9688, 1.0];
 
         function updateImage() {
             const d = new Date();
