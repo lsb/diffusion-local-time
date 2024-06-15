@@ -208,7 +208,7 @@ def main(hour):
     # for minutes in range(4 * 60 + 19, 4 * 60 + 21):
         for fractional_minutes in [f / 32.0 for f in range(32)]:
         # for fractional_minutes in [f / 128.0 for f in range(128)]:
-            p = Path(f"xl-morph-{(minutes // 60):02}{(minutes % 60):02}-{fractional_minutes:.4f}.png")
+            p = Path("xl-morph") / Path(f"xl-morph-{(minutes // 60):02}{(minutes % 60):02}-{fractional_minutes:.4f}.png")
             # print the path name for debugging
             print(p)
             # if the path doesn't exist, generate the image
