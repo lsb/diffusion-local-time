@@ -76,9 +76,11 @@
     function getCurrentParams() {
         const prompt = document.querySelector('fieldset#prompt input[name="face"]:checked').value;
         const now = new Date();
+        console.log("millis", now.getMilliseconds());
+        now.setMilliseconds(now.getMilliseconds() + loadTime);
+        console.log("millis", now.getMilliseconds());
         const hour = now.getHours();
         const minute = now.getMinutes();
-        now.setSeconds(now.getSeconds() + loadTime);
         const microminute = (now.getSeconds() + now.getMilliseconds() / 1000) * 1000000 / 60;
         const seed = 42;
         return {prompt, hour, minute, microminute, seed};
@@ -100,7 +102,7 @@
         const start = new Date();
         await prefetchImage(src);
         const end = new Date();
-        loadTime = (end - start) / 1000;
+        loadTime = (end - start);
         document.getElementById('clockface').src = src;
     }
 
