@@ -10,19 +10,20 @@
           box-sizing: border-box;
           font-size: 16px;
         }
+        fieldset {
+            border: none;
+        }
         body {
             background-color: black;
-            color: #808080
+            color: white;
         }
-        #clockface, #nextface {
+        h1, div { opacity: 0.5;}
+        #clockface{
             width: 100vw;
             height: 50vw;
             position: fixed;
             bottom: 0;
             left: 0;
-        }
-        #nextface {
-            opacity: 0.00001;
         }
     </style>
 </head>
@@ -30,7 +31,7 @@
 <h1>
     Diffusion Local Time, extra small interactive edition
 </h1>
-<div>Face: 
+<div>
     <fieldset id="prompt">
         <input type="radio" id="face1" name="face" value="Seashells on a beach" checked>
         <label for="face1">Seashells</label>
