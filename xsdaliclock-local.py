@@ -124,7 +124,7 @@ class Model:
             draw = ImageDraw.Draw(image)
             draw.text((60, image_size[1]-60), f"leebutterman.com", fill=(255,255,255), font=ocrb)
         byte_stream = io.BytesIO()
-        image.save(byte_stream, format="JPEG")
+        image.save(byte_stream, format="PNG")
         return byte_stream.getvalue()
 
 
@@ -150,7 +150,7 @@ def image():
     seed = request.args.get("seed", 42)
     image = m.pipe_at_middle_time(hour * 60 + minute, fractional_minute, prompt, seed)
 
-    return Response(image, mimetype="image/jpeg")
+    return Response(image, mimetype="image/png")
 
 if __name__ == "__main__":
     app.run()

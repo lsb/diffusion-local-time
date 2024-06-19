@@ -76,9 +76,7 @@
     function getCurrentParams() {
         const prompt = document.querySelector('fieldset#prompt input[name="face"]:checked').value;
         const now = new Date();
-        console.log("millis", now.getMilliseconds());
         now.setMilliseconds(now.getMilliseconds() + loadTime);
-        console.log("millis", now.getMilliseconds());
         const hour = now.getHours();
         const minute = now.getMinutes();
         const microminute = (now.getSeconds() + now.getMilliseconds() / 1000) * 1000000 / 60;
