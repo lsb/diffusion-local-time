@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Current time</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        html {
+          box-sizing: border-box;
+          font-size: 16px;
+        }
+        body {
+            background-color: black;
+            color: #808080
+        }
+        #clockface, #nextface {
+            width: 100vw;
+            height: 50vw;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+        #nextface {
+            opacity: 0.00001;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    Diffusion Local Time, extra small interactive edition
+</h1>
+<div>Face: 
+    <fieldset id="prompt">
+        <input type="radio" id="face1" name="face" value="Seashells on a beach" checked>
+        <label for="face1">Seashells</label>
+        <input type="radio" id="face2" name="face" value="Photo of cinnamon sticks and cardamom pods and cloves and peppercorns and star anise on a marble countertop">
+        <label for="face2">Spices</label>
+        <input type="radio" id="face3" name="face" value="Aerial photo of arches and mesas and buttes in the desert">
+        <label for="face3">Arches</label>
+        <input type="radio" id="face5" name="face" value="Ferns in a redwood forest">
+        <label for="face5">Redwoods</label>
+        <input type="radio" id="face6" name="face" value="Colored pencil drawing of bees on flowers">
+        <label for="face6">Meadow</label>
+        <input type="radio" id="face7" name="face" value="Underwater photo of kelp and starfish and sea anemones and turtles and small fish and sponges and coral">
+        <label for="face7">Reef</label>
+        <input type="radio" id="face4" name="face" value="face4">
+        <label for="face4"><input type="text" id="textface" value="a fruit basket"> </label>
+    </fieldset>
+</div>
+<img id="clockface">
+<script>
+    // const smoothstep6 = (frac) => 924 * Math.pow(frac, 13) - 6006 * Math.pow(frac, 12) + 16380 * Math.pow(frac, 11) - 24024 * Math.pow(frac, 10) + 20020 * Math.pow(frac, 9) - 9009 * Math.pow(frac, 8) + 1716 * Math.pow(frac, 7);
+
+    const face4 = document.getElementById('face4');
+    const textface = document.getElementById('textface');
+    const face = document.querySelector('fieldset#prompt input[name="face"]:checked').value;
+    const text = textface.value;
+    face4.value = text;
+    console.log(face, text);
+    textface.addEventListener('input', (event) => {
+        face4.value = textface.value;
+        face4.checked = true;
+    });
+    let currentSrc = "";
+    // let shouldRenderLatch = true;
+    // let promptAtStartOfMinute = "";
+    // let currentPrompt = "";
+    // let prefetchQueue = []; // of current params
+    // let alreadyPrefetched = []; // of current params 
+    // let currentSlideshow = []; // of current params
+    // let currentParams = {prompt: "", hour: 0, minute: 0, microminute: 0, seed: 42};
+
+    function getCurrentParams() {
+        const prompt = document.querySelector('fieldset#prompt input[name="face"]:checked').value;
+        const now = new Date();
+        const hour = now.getHours();
+        const minute = now.getMinutes();
+        const microminute = (now.getSeconds() + now.getMilliseconds() / 1000) * 1000000 / 60;
+        const seed = 42;
+        return {prompt, hour, minute, microminute, seed};
+    }
+    function urlForParams({prompt, hour, minute, microminute, seed}) {
+        microminute = 0; // TODO FIXME
+        return `./image?hour=${hour}&minute=${minute}&microminute=${microminute}&seed=${seed}&prompt=${encodeURIComponent(prompt.trim())}`;
+    }
+    async function prefetchLoop() {
+        // TODO
+    }
+    async function prefetchImage(src) {
+        const img = new Image();
+        img.src = src;
+        await img.decode();
+        return;
+    }
+    async function loadNewFace(src) {
+        await prefetchImage(src);
+        document.getElementById('clockface').src = src;
+    }
+
+    async function renderLoop() {
+        // rely on the prefetchLoop() to generate images quickly
+        // if the current slideshow is empty, and the current params is in the prefetch queue, we're not ready to render, just wait
+        // if there is no we don't have the current prompt in the current slideshow, stick it into the prefetch queue
+        // if we don't have the next minute's prompt in the next slideshow, stick it into the prefetch queue
+        // if the prefetch queue is empty, add exponentially more images into it
+
+        // dumbest thing that could work: just render the current image
+        const newURL = urlForParams(getCurrentParams());
+        const oldURL = currentSrc;
+        if(newURL !== oldURL) {
+            // console.log("loading new face: ", newURL)
+            await loadNewFace(newURL);
+            currentSrc = newURL;
+        } else {
+            // wait a second
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+        requestAnimationFrame(renderLoop);
+    };
+
+    renderLoop();
+</script>
+</body>
+</html>
