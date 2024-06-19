@@ -24,6 +24,14 @@
             position: fixed;
             bottom: 0;
             left: 0;
+            z-index: 1;
+        }
+        #signature {
+            position: fixed;
+            bottom: 0.5in;
+            right: 0.5in;
+            font-size: 0.5in;
+            z-index: 100;
         }
     </style>
 </head>
@@ -48,6 +56,9 @@
         <input type="radio" id="face4" name="face" value="face4">
         <label for="face4"><input type="text" id="textface" value="a fruit basket"> </label>
     </fieldset>
+</div>
+<div id="signature">
+    by Lee Butterman
 </div>
 <img id="clockface">
 <script>

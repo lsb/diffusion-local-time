@@ -31,6 +31,7 @@ img {
         #face { height: 56.25vw; width: 100vw; position: fixed; top: 0; left: 0;}
         #nextface { height: 56.25vw; width: 100vw; position: fixed; top: 0; left: 0; opacity: 0.00001;}
         body { background-color: black;}
+        #signature { position: fixed; bottom: 0.5in; right: 0.5in; font-size: 0.5in; z-index: 100; opacity: 0.5; color: white;}
     </style>
     <script>
         const smoothstep = (frac) => 3 * frac * frac - 2 * frac * frac * frac;
@@ -85,5 +86,6 @@ img {
     <h1 id="displayText">time of day</h1>
     <img id="face" src="">
     <img id="nextface" src="">
+    <div id="signature">by Lee Butterman</div>
 </body>
 </html>
