@@ -64,6 +64,7 @@
         face4.checked = true;
     });
     let currentSrc = "";
+    let loadTime = 0;
     // let shouldRenderLatch = true;
     // let promptAtStartOfMinute = "";
     // let currentPrompt = "";
@@ -77,6 +78,7 @@
         const now = new Date();
         const hour = now.getHours();
         const minute = now.getMinutes();
+        now.setSeconds(now.getSeconds() + loadTime);
         const microminute = (now.getSeconds() + now.getMilliseconds() / 1000) * 1000000 / 60;
         const seed = 42;
         return {prompt, hour, minute, microminute, seed};
@@ -95,7 +97,10 @@
         return;
     }
     async function loadNewFace(src) {
+        const start = new Date();
         await prefetchImage(src);
+        const end = new Date();
+        loadTime = (end - start) / 1000;
         document.getElementById('clockface').src = src;
     }
 
