@@ -1,0 +1,15 @@
+# this is a docker compose file that builds the server from the Dockerfile in the same directory
+# and runs it on port 8080
+# and mount the cache directory `cache` into the container at `/cache`
+version: '3'
+services:
+  server:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - "./cache:/cache"
+    environment:
+      - HF_HOME=/cache
+    # network_mode: host
+    restart: unless-stopped
