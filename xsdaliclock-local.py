@@ -1,6 +1,6 @@
 import torch
 
-torch.num_threads = 4
+#torch.num_threads = 4
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageEnhance, ImageFilter
@@ -52,7 +52,7 @@ class Model:
             subfolder=ctlnetmodelsubfolder,
             torch_dtype=preferred_dtype,
         ).to(preferred_device)
-        self.pipe = sdconstructor.from_pretrained(
+        self.pipeline = sdconstructor.from_pretrained(
             sdmodelname,
             controlnet=controlnet,
             torch_dtype=preferred_dtype,
@@ -76,20 +76,7 @@ class Model:
             spacing=-10,
         )
         ballooned = ImageEnhance.Contrast(time_img.filter(ImageFilter.GaussianBlur(6))).enhance(50.0)
-        return ballooned.filter(ImageFilter.GaussianBlur(7.5))
-
-    def pipe(self, prompt, negative_prompt, image, num_inference_steps, guidance_scale, controlnet_conditioning_scale, generator, height, width):
-        return self.pipe(
-            prompt=prompt,
-            negative_prompt=negative_prompt,
-            image=image,
-            num_inference_steps=num_inference_steps,
-            guidance_scale=guidance_scale,
-            controlnet_conditioning_scale=controlnet_conditioning_scale,
-            generator=generator,
-            height=height,
-            width=width,
-        ).images[0]
+        return ballooned.filter(ImageFilter.GaussianBlur(3))
 
     @lru_cache
     def encode_prompt(self, prompt):
@@ -102,14 +89,14 @@ class Model:
         # prompt = prompts[0]
         if seed is None:
             seed = int(synthetic_time.timestamp()) // 60 // 60
-        controlnet_conditioning_scale = conditioning_scales[prompt] if prompt in conditioning_scales else 0.85
+        controlnet_conditioning_scale = conditioning_scales[prompt] if prompt in conditioning_scales else 0.7
         generator = torch.manual_seed(seed)
         this_mask = self.mask_image(synthetic_time)
         next_mask = self.mask_image(synthetic_time + timedelta(minutes=1))
         current_mask_image = Image.fromarray(np.array(this_mask) * (1-fractional_minutes) + np.array(next_mask) * (fractional_minutes))
         print("prompt: ", prompt)
 
-        image = self.pipe(
+        image = self.pipeline(
             prompt=prompt,
             negative_prompt=negative_prompt,
             image=current_mask_image,
@@ -117,8 +104,8 @@ class Model:
             guidance_scale=0.0,
             controlnet_conditioning_scale=controlnet_conditioning_scale,
             generator=generator,
-            height=image_size[1],
-            width=image_size[0],
+            height=image_size[1] * 2,
+            width=image_size[0] * 2,
         ).images[0]
         if False:
             draw = ImageDraw.Draw(image)
