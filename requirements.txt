@@ -5,3 +5,4 @@ accelerate
 flask
 pillow
 numpy
+optimum-quanto

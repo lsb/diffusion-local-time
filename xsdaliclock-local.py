@@ -12,6 +12,7 @@ import io
 from pathlib import Path
 from tqdm import tqdm
 from functools import lru_cache
+from optimum.quanto import quantize, qint8, freeze
 
 
 ctlnetmodelname = "IDKiro/sdxs-512-dreamshaper-sketch"
@@ -58,6 +59,15 @@ class Model:
             torch_dtype=preferred_dtype,
             safety_checker=None,
         ).to(preferred_device)
+        quantize(self.pipeline.controlnet, weights=qint8)
+        freeze(self.pipeline.controlnet)
+        quantize(self.pipeline.unet, weights=qint8)
+        freeze(self.pipeline.unet)
+        quantize(self.pipeline.vae, weights=qint8)
+        freeze(self.pipeline.vae)
+        self.pipeline.controlnet = torch.compile(self.pipeline.controlnet)
+        self.pipeline.unet = torch.compile(self.pipeline.unet)
+        self.pipeline.vae = torch.compile(self.pipeline.vae)
         #self.pipe.set_progress_bar_config(disable=True)
 
     def mask_image(self, timestamp):
