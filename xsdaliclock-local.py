@@ -129,6 +129,8 @@ m = Model()
 m.build()
 m.enter()
 
+m.pipe_at_middle_time(0, 0, "warmup", 42)
+
 from flask import Flask, request, Response
 
 app = Flask(__name__)
