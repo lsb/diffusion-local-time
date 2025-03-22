@@ -114,8 +114,8 @@ class Model:
             guidance_scale=0.0,
             controlnet_conditioning_scale=controlnet_conditioning_scale,
             generator=generator,
-            height=image_size[1] * 2,
-            width=image_size[0] * 2,
+            height=image_size[1] * 5 // 2,
+            width=image_size[0] * 5 // 2,
         ).images[0]
         if False:
             draw = ImageDraw.Draw(image)
