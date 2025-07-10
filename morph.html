@@ -77,7 +77,7 @@ img {
             // document.getElementById("nextface").title = `${hodz2next}:${modz2next} @ ${finalstep4next}`;
             document.getElementById("displayText").textContent = displayText + ` (${img_path_next})`;
 
-            requestAnimationFrame(updateImage);
+            document.getElementById("nextface").onload = (() => requestAnimationFrame(updateImage));
         }
         window.onload = updateImage;
     </script>
